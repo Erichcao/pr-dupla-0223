@@ -1,8 +1,9 @@
 def validar_email(email):
     """
-    Valida um endereço de e-mail com base nos critérios estritos do projeto.
+    Valida um endereço de e-mail com base nos critérios do projeto,
+    suportando domínios internacionais e locais (como .com.br).
     """
-    # 1. Rejeitar None e garantir que é uma string
+    # 1. Rejeitar explicitamente None e garantir que é uma string
     if email is None or not isinstance(email, str):
         return False
         
@@ -24,9 +25,15 @@ def validar_email(email):
     if dominio.endswith("."):
         return False
         
-    # 6. Domínio com duas partes não vazias (ex: empresa.com)
-    partes_dominio = dominio.split(".")
-    if len(partes_dominio) != 2 or not partes_dominio[0] or not partes_dominio[1]:
+    # 6. O domínio precisa ter pelo menos um ponto para separar as partes
+    if "." not in dominio:
         return False
         
+    # 7. Garantir que NENHUMA das partes do domínio esteja vazia
+    # Isso resolve casos como "ana@.com", "ana@empresa..com" ou "ana@empresa."
+    partes_dominio = dominio.split(".")
+    for parte in partes_dominio:
+        if not parte:  # Se qualquer parte for vazia "", rejeita
+            return False
+            
     return True
